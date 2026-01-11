@@ -2,21 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CRITICAL: Reset Box Model */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 
+   MOBILE VIEWPORT FIX
+   We use position: fixed to lock the viewport to the screen.
+   This prevents the "rubber-band" scrolling on iOS and ensures
+   the canvas always fills the visible area.
+*/
 html,
-body,
-#root {
+body {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Fallback */
   width: 100vw;
+  height: 100%;
+  /* Fallback */
   height: 100dvh;
-  /* Dynamic viewport height fixes mobile browser bar issues */
+  /* Dynamic Height */
   margin: 0;
   padding: 0;
   overflow: hidden;
   background-color: #000;
   user-select: none;
   touch-action: none;
-  /* Prevent browser zooming/scrolling */
+  overscroll-behavior: none;
+}
+
+#root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 canvas {
+  display: block;
+  /* Removes bottom margin ghost space */
   outline: none;
+  touch-action: none;
 }

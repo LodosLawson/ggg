@@ -1,10 +1,23 @@
 // import { useRef } from 'react'; // Unused
+import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
 export function DynamicSky() {
     // Fog and Background handled by FogController
+    // Rotating Sun (Day/Night Cycle)
+    const sunRef = useRef(new THREE.Vector3());
+    useFrame(({ clock }) => {
+        const time = clock.getElapsedTime() * 0.1; // Speed of day
+        // Circle around Z axis? Or X?
+        // Sun rises in East (X+), sets West (X-)
+        const x = Math.sin(time) * 100;
+        const y = Math.cos(time) * 100;
+        const z = 25; // Slight offset
+        sunRef.current.set(x, y, z);
+    });
+
     return (
         <group>
             {/* 
@@ -12,7 +25,7 @@ export function DynamicSky() {
              */}
             <Sky
                 distance={450000}
-                sunPosition={[50, 50, 25]}
+                sunPosition={sunRef.current}
                 inclination={0}
                 azimuth={0.25}
             />
