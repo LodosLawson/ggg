@@ -12,6 +12,8 @@ body,
   overflow: hidden;
   background-color: #000;
   user-select: none;
+  touch-action: none;
+  /* Prevent browser zooming/scrolling */
 }
 
 canvas {
