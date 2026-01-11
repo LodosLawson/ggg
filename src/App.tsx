@@ -22,7 +22,7 @@ export default function App() {
 
     return (
         <>
-            <div className="w-full h-full relative">
+            <div className="w-screen h-[100dvh] relative overflow-hidden">
                 <MobileControls />
                 <Leva collapsed hidden={window.location.hash !== '#debug'} />
 
