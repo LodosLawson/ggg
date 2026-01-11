@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
+import { createNoise2D } from 'simplex-noise';
 
 // Shared Noise Instance to ensure continuity across chunks
-// We might need to move this to a context or keep it singleton for now.
-
+const noise2D = createNoise2D();
 
 interface VoxelChunkProps {
     position: [number, number]; // [x, z] world position
@@ -14,10 +14,6 @@ interface VoxelChunkProps {
 type BlockData = { x: number; y: number; z: number; id: number };
 
 export function VoxelChunk({ position, chunkSize = 16, chunkHeight = 64 }: VoxelChunkProps) {
-    // chunkHeight unused for flat plane optimization
-    // (void chunkHeight); // Hack or just remove it from destructuring if strictly unused.
-    // Let's just consume it to silence the linter for now in case we revert to terrain.
-    const _h = chunkHeight;
     const meshRef = useRef<THREE.InstancedMesh>(null);
     const [worldX, worldZ] = position;
 
@@ -29,9 +25,20 @@ export function VoxelChunk({ position, chunkSize = 16, chunkHeight = 64 }: Voxel
         // Loop through local chunk coordinates
         for (let x = 0; x < chunkSize; x++) {
             for (let z = 0; z < chunkSize; z++) {
-                // FLAT PLANE "DUZLEM" GENERATION
-                const height = 1; // Flat height at Y=1
-                const yStart = 0;
+                // Global coordinates for noise
+                const globalX = worldX + x;
+                const globalZ = worldZ + z;
+
+                const scale = 0.02; // Lower scale for larger, smoother hills
+                // Use global coords
+                const noiseVal = noise2D(globalX * scale, globalZ * scale);
+                // 0..1 normalization roughly? noise is -1..1
+                // Let's create varying terrain: Mountains, Plains
+
+                const height = Math.floor((noiseVal + 1) * 0.5 * chunkHeight); // 0 to chunkHeight
+
+                // Optimization: Render surface only (top 3 blocks) plus strict limits
+                const yStart = Math.max(0, height - 3);
 
                 for (let y = yStart; y <= height; y++) {
                     // Local position in mesh is x, y, z

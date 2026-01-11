@@ -25,7 +25,7 @@ export function WorldScene({ onExit }: WorldSceneProps) {
 
             <Physics gravity={[0, -9.81, 0]}>
                 <ChunkManager />
-                <Player position={[0, 50, 0]} /> {/* Spawn high up to see generation */}
+                <Player position={[0, 10, 0]} /> {/* Spawn closer to ground */}
             </Physics>
 
             {/* Helper to exit */}

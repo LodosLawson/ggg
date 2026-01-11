@@ -1,11 +1,15 @@
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { WorldScene } from './scenes/WorldScene';
+import { GalaxyScene } from './scenes/GalaxyScene';
 import { MobileControls } from './components/ui/MobileControls';
 import { UIOverlay } from './components/ui/UIOverlay';
 import { Loader } from '@react-three/drei';
 
 export default function App() {
+    // Start in GALAXY view to choose a planet
+    const [gameState, setGameState] = useState<'GALAXY' | 'WORLD'>('GALAXY');
+
     // Resize handler to ensure 100% height on weird mobile browsers
     useEffect(() => {
         const setHeight = () => {
@@ -17,6 +21,10 @@ export default function App() {
 
         return () => window.removeEventListener('resize', setHeight);
     }, []);
+
+    const startWorld = () => {
+        setGameState('WORLD');
+    };
 
     return (
         <>
@@ -30,21 +38,23 @@ export default function App() {
             >
                 <color attach="background" args={['#000']} />
                 <Suspense fallback={null}>
-                    {/* Direct World Entry - No States for now to simplify */}
-                    <WorldScene onExit={() => { }} />
+                    {gameState === 'GALAXY' ? (
+                        <GalaxyScene onSelectPlanet={startWorld} />
+                    ) : (
+                        <WorldScene onExit={() => setGameState('GALAXY')} />
+                    )}
                 </Suspense>
             </Canvas>
 
             {/* UI overlay is separate from Canvas */}
-            {/* pointer-events-none lets clicks pass through to Canvas */}
             <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-                <MobileControls />
-                <UIOverlay gameState="WORLD" />
+                {gameState === 'WORLD' && <MobileControls />}
+                <UIOverlay gameState={gameState} />
             </div>
 
             <Loader />
         </>
     );
-}
 
+}
 // export default App; // Removed duplicate
